@@ -5,6 +5,7 @@ const fs = require('fs');
 const Discord = require('discord.js');
 const client = new Discord.Client();
 
+// Preface
 client.commands = new Discord.Collection();
 
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
@@ -17,6 +18,22 @@ for (const file of commandFiles) {
     client.commands.set(command.name, command);
 }
 
+// Card functions
+
+client.cards = new Array();
+client.discarded = new Array();
+
+for(const type of ["clubs", "spades", "hearts", "diamonds"]) {
+    for(let i = 2; i <= 14; i++)
+    {
+        client.cards.push({type: type, value: i});
+    }
+}
+
+client.cards.push({type: "black_circle", value: 15});
+client.cards.push({type: "red_circle", value: 15});
+
+//client methods
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag} with ${client.user.id}!`);
 });
@@ -31,11 +48,11 @@ client.on('message', message => {
     }
 
     const args = message.content.split(/ +/);
-    console.debug(args);
     const mention = args.shift();
-    const command = args.shift().toLowerCase();
 
     if (message.mentions.has(client.user.id) && mention === `<@!${client.user.id}>`) {
+        const command = args.shift().toLowerCase();
+
         if (!client.commands.has(command)) {
             return;
         }
@@ -49,7 +66,5 @@ client.on('message', message => {
         }
     };
 });
-
-
 
 client.login(process.env.DISCORD_TOKEN);
